@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maidan Live: scores and schedule</title>
+<meta name="description" content="Live scores and match schedules for football, basketball, NFL, baseball and hockey, updated automatically.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#14308F; --ink:#0E1A33; --panel:#16254a; --line:#2b3a5c; --chalk:#F2F5F7; --mist:#B9C4D6; --yellow:#FFD23F; --red:#FF5A4D;
+  --display:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);font-size:18px;line-height:1.5;color:var(--chalk);background:var(--ink)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+header{background:var(--blue)}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+.logo{font-family:var(--display);font-weight:800;font-size:22px;color:var(--chalk);text-decoration:none}
+.back{font-weight:600;font-size:16px;color:var(--chalk)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(36px,7vw,64px);line-height:1.05;letter-spacing:-.02em;padding:28px 0 8px}
+.sub{color:var(--mist);margin-bottom:20px}
+
+.scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.scroll button{flex:none;font:inherit;font-weight:600;cursor:pointer;border-radius:6px;border:2px solid var(--line);background:transparent;color:var(--chalk);padding:8px 14px}
+.scroll button:hover{border-color:var(--mist)}
+.scroll button[aria-pressed="true"]{background:var(--yellow);border-color:var(--yellow);color:var(--ink)}
+.days button{text-align:center;min-width:62px;padding:6px 8px;line-height:1.2}
+.days small{display:block;font-size:13px;font-weight:400}
+.days b{font-family:var(--display);font-size:20px}
+.days .today small::after{content:" (today)"}
+
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:24px 0 8px}
+.head h2{font-family:var(--display);font-weight:800;font-size:26px}
+#status{font-size:15px;color:var(--mist)}
+
+.match{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;padding:14px 12px;background:var(--panel);border-bottom:2px solid var(--ink)}
+.when{font-weight:600;font-size:16px;color:var(--mist)}
+.match.live .when{color:var(--red)}
+.match.live .when::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:6px}
+.t{display:flex;align-items:center;gap:10px;padding:3px 0}
+.t img,.ph{width:28px;height:28px;object-fit:contain;flex:none}
+.ph{border-radius:50%;background:var(--line)}
+.nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc{font-family:var(--display);font-size:24px;min-width:1.5em;text-align:right}
+.t.win .nm{font-weight:600}
+.t:not(.win) .sc{font-weight:600;color:var(--mist)}
+.t.win .sc{color:var(--yellow)}
+.msg{padding:40px 12px;text-align:center;color:var(--mist);background:var(--panel)}
+.msg button{margin-top:12px;font:inherit;font-weight:600;padding:8px 18px;border-radius:6px;border:0;background:var(--yellow);cursor:pointer}
+footer{margin:32px 0 48px;font-size:14px;color:var(--mist)}
+@media (max-width:520px){.match{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="index.html">Maidan</a>
+    <a class="back" href="index.html">Back to club page</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Live scores and schedule</h1>
+  <p class="sub">Pick a league and a day. Scores refresh by themselves every minute.</p>
+
+  <div class="scroll" id="leagues" role="group" aria-label="League"></div>
+  <div class="scroll days" id="days" role="group" aria-label="Day"></div>
+
+  <div class="head">
+    <h2 id="title">Premier League</h2>
+    <span id="status" role="status" aria-live="polite"></span>
+  </div>
+  <div id="list"></div>
+
+  <footer>Data comes from ESPN's public scoreboard feed. This page is not affiliated with ESPN. Times are shown in your local time zone.</footer>
+</main>
+
+<script>
+(function(){
+  var BASE="https://site.api.espn.com/apis/site/v2/sports/";
+  var LEAGUES=[
+    {k:"soccer/eng.1",n:"Premier League"},
+    {k:"soccer/esp.1",n:"La Liga"},
+    {k:"soccer/ger.1",n:"Bundesliga"},
+    {k:"soccer/ita.1",n:"Serie A"},
+    {k:"soccer/uefa.champions",n:"Champions League"},
+    {k:"soccer/usa.1",n:"MLS"},
+    {k:"basketball/nba",n:"NBA"},
+    {k:"football/nfl",n:"NFL"},
+    {k:"football/college-football",n:"College Football",g:80},
+    {k:"baseball/mlb",n:"MLB"},
+    {k:"hockey/nhl",n:"NHL"}
+  ];
+  var cur=LEAGUES[0], day=startOfDay(new Date()), seq=0;
+  var $=function(id){return document.getElementById(id)};
+
+  function startOfDay(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+  function pad(n){return n<10?"0"+n:""+n}
+  function ymd(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+  function same(a,b){return ymd(a)===ymd(b)}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+
+  function buildLeagues(){
+    var box=$("leagues"); box.innerHTML="";
+    LEAGUES.forEach(function(l){
+      var b=document.createElement("button");
+      b.textContent=l.n;
+      b.setAttribute("aria-pressed",l===cur);
+      b.onclick=function(){cur=l;buildLeagues();load()};
+      box.appendChild(b);
+    });
+  }
+
+  function buildDays(){
+    var box=$("days"); box.innerHTML="";
+    var today=startOfDay(new Date());
+    for(var i=-2;i<=11;i++){
+      var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i);
+      var b=document.createElement("button");
+      b.innerHTML="<small>"+d.toLocaleDateString([], {weekday:"short"})+"</small><b>"+d.getDate()+"</b>";
+      if(i===0) b.className="today";
+      b.setAttribute("aria-pressed",same(d,day));
+      b.onclick=(function(dd){return function(){day=dd;buildDays();load()}})(d);
+      box.appendChild(b);
+    }
+  }
+
+  function teamRow(c,state){
+    var t=c.team||{};
+    var logo=t.logo?'<img src="'+esc(t.logo)+'" alt="" loading="lazy" onerror="this.outerHTML=\'<span class=ph></span>\'">':'<span class="ph"></span>';
+    var score=(state!=="pre"&&c.score!=null)?esc(c.score):"";
+    return '<div class="t'+(c.winner?" win":"")+'">'+logo+'<span class="nm">'+esc(t.displayName||t.name||"To be decided")+'</span><span class="sc">'+score+'</span></div>';
+  }
+
+  function render(events){
+    var list=$("list");
+    if(!events.length){
+      list.innerHTML='<div class="msg">No matches on this day. Pick another day above.</div>';
+      return;
+    }
+    events.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+    var usStyle=cur.k.indexOf("soccer/")!==0;
+    list.innerHTML=events.map(function(ev){
+      var comp=(ev.competitions&&ev.competitions[0])||{};
+      var cs=(comp.competitors||[]).slice();
+      var home=cs.filter(function(c){return c.homeAway==="home"})[0]||cs[0];
+      var away=cs.filter(function(c){return c.homeAway==="away"})[0]||cs[1];
+      if(!home||!away) return "";
+      var st=(ev.status&&ev.status.type)||{};
+      var state=st.state||"pre";
+      var when;
+      if(state==="pre") when=new Date(ev.date).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+      else when=st.shortDetail||st.description||"";
+      if(st.name==="STATUS_POSTPONED"||st.name==="STATUS_CANCELED") when=st.description||when;
+      var first=usStyle?away:home, second=usStyle?home:away;
+      return '<div class="match'+(state==="in"?" live":"")+'"><div class="when">'+esc(when)+'</div><div>'+teamRow(first,state)+teamRow(second,state)+'</div></div>';
+    }).join("");
+  }
+
+  function load(){
+    var mine=++seq;
+    $("title").textContent=cur.n+", "+day.toLocaleDateString([], {weekday:"long",day:"numeric",month:"long"});
+    $("status").textContent="Loading…";
+    fetch(BASE+cur.k+"/scoreboard?dates="+ymd(day)+"&limit=200"+(cur.g?"&groups="+cur.g:""))
+      .then(function(r){if(!r.ok) throw new Error("HTTP "+r.status);return r.json()})
+      .then(function(j){
+        if(mine!==seq) return;
+        render(j.events||[]);
+        $("status").textContent="Updated "+new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+      })
+      .catch(function(){
+        if(mine!==seq) return;
+        $("list").innerHTML='<div class="msg">Could not load matches. Check your connection.<br><button id="retry">Try again</button></div>';
+        $("retry").onclick=load;
+        $("status").textContent="";
+      });
+  }
+
+  buildLeagues(); buildDays(); load();
+
+  // Auto-refresh every minute while the tab is visible and today is selected
+  setInterval(function(){
+    if(!document.hidden && same(day,startOfDay(new Date()))) load();
+  },60000);
+})();
+</script>
+</body>
+</html>
