@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maidan Sports Club: every sport, one field</title>
+<meta name="description" content="Join Maidan Sports Club. Football, cricket, basketball, badminton, swimming and athletics with coaches for every age.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#14308F; --ink:#0E1A33; --chalk:#F2F5F7; --green:#1E8C4E; --yellow:#FFD23F; --mist:#DCE3EC;
+  --display:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);font-size:18px;line-height:1.6;color:var(--ink);background:var(--chalk)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--display);line-height:1.05;letter-spacing:-.02em}
+
+/* header */
+header{background:var(--blue);color:var(--chalk)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{font-family:var(--display);font-weight:800;font-size:22px;text-decoration:none}
+nav a{margin-left:24px;text-decoration:none;font-weight:600;font-size:16px}
+nav a:hover{text-decoration:underline}
+
+/* hero: the court */
+.hero{position:relative;background:var(--blue);color:var(--chalk);overflow:hidden;padding:56px 0 96px}
+.court{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
+.hero .wrap{position:relative}
+.hero h1{font-weight:800;font-size:clamp(56px,12vw,150px);max-width:9em}
+.hero p{max-width:34em;font-size:21px;margin:24px 0 32px}
+.btn{display:inline-block;background:var(--yellow);color:var(--ink);font-family:var(--display);font-weight:800;font-size:18px;padding:14px 28px;border:0;border-radius:6px;text-decoration:none;cursor:pointer}
+.btn:hover{background:#fff}
+.btn.ghost{background:transparent;color:var(--chalk);border:2px solid var(--chalk);margin-left:12px}
+.btn.ghost:hover{background:var(--chalk);color:var(--blue)}
+
+/* sections */
+section{padding:80px 0}
+section h2{font-weight:800;font-size:clamp(34px,5vw,56px);margin-bottom:12px}
+.lead{max-width:36em;margin-bottom:40px;color:#33415c}
+
+/* sports */
+.sports{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0;border-top:2px solid var(--ink)}
+.sport{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:22px 4px;border-bottom:2px solid var(--ink)}
+.sport h3{font-weight:800;font-size:32px}
+.sport span{font-size:16px;text-align:right;color:#33415c}
+
+/* fixtures scoreboard */
+.board{background:var(--ink);color:var(--chalk)}
+.board h2{color:var(--yellow)}
+.board .lead{color:var(--mist)}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{text-align:left;padding:16px 12px;border-bottom:1px solid #2b3a5c}
+.table th{font-weight:600;font-size:15px;color:var(--mist)}
+.table td:first-child{font-family:var(--display);font-weight:800;font-size:22px;color:var(--yellow);white-space:nowrap}
+.tbl-scroll{overflow-x:auto}
+
+/* join */
+.join{background:var(--green);color:#fff}
+.join .lead{color:#E6F6EC}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:760px}
+label{display:block;font-weight:600;font-size:16px;margin-bottom:4px}
+input,select{width:100%;font:inherit;padding:12px;border:2px solid transparent;border-radius:6px;background:#fff;color:var(--ink)}
+.full{grid-column:1/-1}
+#msg{margin-top:16px;font-weight:600;min-height:1.6em}
+
+footer{background:var(--ink);color:var(--mist);padding:32px 0;font-size:16px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+@media (max-width:640px){
+  nav a{margin-left:14px}
+  .btn.ghost{margin:12px 0 0}
+  section{padding:56px 0}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#top">Maidan</a>
+    <nav aria-label="Main">
+      <a href="#sports">Sports</a>
+      <a href="#fixtures">Fixtures</a>
+      <a href="#join">Join</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <svg class="court" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none" stroke="#F2F5F7" stroke-width="4">
+        <rect x="40" y="40" width="1120" height="520"/>
+        <line x1="600" y1="40" x2="600" y2="560"/>
+        <circle cx="600" cy="300" r="90"/>
+        <rect x="40" y="170" width="170" height="260"/>
+        <rect x="990" y="170" width="170" height="260"/>
+        <path d="M210 230 A80 80 0 0 1 210 370"/>
+        <path d="M990 230 A80 80 0 0 0 990 370"/>
+      </g>
+    </svg>
+    <div class="wrap">
+      <h1>Every sport. One maidan.</h1>
+      <p>Coached training in football, cricket, basketball, badminton, swimming and athletics. Kids, teens and adults all start at the right level.</p>
+      <a class="btn" href="#join">Book a free trial</a>
+      <a class="btn ghost" href="#sports">See the sports</a>
+    </div>
+  </div>
+
+  <section id="sports">
+    <div class="wrap">
+      <h2>Pick your game</h2>
+      <p class="lead">Each sport has its own coach, squad and weekly schedule. Try one, switch any time.</p>
+      <div class="sports">
+        <div class="sport"><h3>Football</h3><span>Mon, Wed, Fri<br>5:00 pm</span></div>
+        <div class="sport"><h3>Cricket</h3><span>Sat, Sun<br>7:00 am</span></div>
+        <div class="sport"><h3>Basketball</h3><span>Tue, Thu<br>6:00 pm</span></div>
+        <div class="sport"><h3>Badminton</h3><span>Daily<br>6:00 am and 7:00 pm</span></div>
+        <div class="sport"><h3>Swimming</h3><span>Mon to Sat<br>6:30 am</span></div>
+        <div class="sport"><h3>Athletics</h3><span>Tue, Thu, Sat<br>5:30 pm</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fixtures" class="board">
+    <div class="wrap">
+      <h2>Upcoming fixtures</h2>
+      <p class="lead">Come and cheer. Entry to every home match is free for members and their families.</p>
+      <div class="tbl-scroll">
+        <table class="table">
+          <thead><tr><th>Date</th><th>Sport</th><th>Match</th><th>Venue</th></tr></thead>
+          <tbody>
+            <tr><td>Sat 1 Nov</td><td>Football</td><td>Maidan vs Riverside FC</td><td>Home ground</td></tr>
+            <tr><td>Sun 2 Nov</td><td>Cricket</td><td>Maidan vs City Strikers</td><td>Home ground</td></tr>
+            <tr><td>Fri 7 Nov</td><td>Basketball</td><td>Maidan vs Hoop Union</td><td>Indoor court</td></tr>
+            <tr><td>Sat 15 Nov</td><td>Badminton</td><td>Inter-club doubles</td><td>Indoor hall</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="join" class="join">
+    <div class="wrap">
+      <h2>Book a free trial session</h2>
+      <p class="lead">Tell us who is playing and which sport. We reply within one day with a time.</p>
+      <form id="trial">
+        <div><label for="name">Name</label><input id="name" required autocomplete="name"></div>
+        <div><label for="phone">Phone</label><input id="phone" type="tel" required autocomplete="tel"></div>
+        <div class="full"><label for="sport">Sport</label>
+          <select id="sport">
+            <option>Football</option><option>Cricket</option><option>Basketball</option>
+            <option>Badminton</option><option>Swimming</option><option>Athletics</option>
+          </select>
+        </div>
+        <div class="full"><button class="btn" type="submit">Book my trial</button></div>
+      </form>
+      <p id="msg" role="status"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Maidan Sports Club</span>
+    <span>Open daily, 6:00 am to 9:00 pm</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById("trial").addEventListener("submit",function(e){
+  e.preventDefault();
+  var n=document.getElementById("name").value.trim();
+  var s=document.getElementById("sport").value;
+  document.getElementById("msg").textContent="Thanks, "+n+". We will contact you about your "+s+" trial.";
+  this.reset();
+});
+</script>
+</body>
+</html>
